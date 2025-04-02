@@ -6,9 +6,9 @@ Pb_myregion <- filter(Pb_all, region=="VastraGotaland")
 summary(Pb_myregion)
 ##1.A  Linear model####
 ###1.A(a)####
-ggplot(data=Pb_myregion,aes((year),log(Pb)))+geom_point()
+ggplot(data=Pb_myregion,aes((year),Pb))+geom_point()
 ###1.A(b)#####
-ggplot(data=Pb_myregion,aes((year-1975),log(Pb)))+geom_point()
+ggplot(data=Pb_myregion,aes((year-1975),Pb))+geom_point()
 ##1.A(c-e)####
 Pb_lm <- lm(Pb~I(year-1975), data=Pb_myregion)
 summary(Pb_lm)
@@ -63,4 +63,6 @@ ggplot(Pb_myregion, aes(sample = e)) +
 
 ggplot(Pb_myregion, aes(x = e)) +
   geom_bar(width=1) + scale_x_binned()
-##.B(a)
+##.B(a-b)
+Pb_myregion <- filter(Pb_all, region=="VastraGotaland") #Reset region
+
