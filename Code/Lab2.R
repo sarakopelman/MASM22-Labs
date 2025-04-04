@@ -38,3 +38,43 @@ ggplot(Pb_all, aes(x=yhat,y=e)) + geom_point() +
   expand_limits(y=Pb_lim_e) + facet_wrap(~region)
 ggplot(Pb_all, aes(sample = e)) +
   geom_qq() + geom_qq_line()+facet_wrap(~region)
+#2.B(a)
+ggplot(data=Pb_all,aes(year,Pb))+geom_point()+facet_wrap(~region)
+#2.B(b-c)
+ggplot(data=Pb_all,aes(year,log(Pb)))+geom_point()+facet_wrap(~region)
+#2.B(d)
+Pb_all <- mutate(Pb_all,region = relevel(region,"VastraGotaland"))
+Pb_lm <- lm(log(Pb)~I(year-1975)+region,data=Pb_all)
+Pb_lm_sum <- summary(Pb_lm)
+exp(Pb_lm$coefficients)
+exp(confint(Pb_lm))
+#2.B(e)
+Pb_x0 <- data.frame(year=2003,region="VastraGotaland")
+cbind(Pb_x0,predict(Pb_lm,newdata=Pb_x0,se.fit=TRUE),
+      conf = predict(Pb_lm, newdata = Pb_x0,interval = "confidence"),
+      pred = predict(Pb_lm, newdata = Pb_x0, interval = "prediction")) |>
+  mutate(df=NULL,
+         residual.scale=NULL,
+         conf.fit=NULL,
+         pred.fit=NULL,
+         se.pred=sqrt(Pb_lm_sum$sigma^2+se.fit^2)) ->
+  Pb_x0_pred
+Pb_x0_pred
+exp(Pb_x0_pred[, 3:ncol(Pb_x0_pred)])
+#2.B(f)
+exp(Pb_lm$coefficients)
+exp(confint(Pb_lm))
+#2.B(g)
+Pb_x0 <- data.frame(year=c(1975,2003), region=rep("Orebro",2))
+cbind(Pb_x0,predict(Pb_lm,newdata=Pb_x0,se.fit=TRUE),
+      conf = predict(Pb_lm, newdata = Pb_x0,interval = "confidence"),
+      pred = predict(Pb_lm, newdata = Pb_x0, interval = "prediction")) |>
+  mutate(df=NULL,
+         residual.scale=NULL,
+         conf.fit=NULL,
+         pred.fit=NULL,
+         se.pred=sqrt(Pb_lm_sum$sigma^2+se.fit^2)) ->
+  Pb_x0_pred
+Pb_x0_pred
+exp(Pb_x0_pred[, 3:ncol(Pb_x0_pred)])
+
