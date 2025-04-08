@@ -28,8 +28,8 @@ ggplot(cbind(bad_pred), aes(x = year, y=v)) +
   geom_hline(yintercept = 2*pplus1b/n, color = "red")
 
 ##3.A(b)
-n <- nobs(Pb_lm)
 Pb_lm <- lm(log(Pb)~I(year-1975)+region, Pb_all)
+n <- nobs(Pb_lm)
 Pb_pred <- mutate(Pb_all,
                    yhat = predict(Pb_lm),
                    r = rstudent(Pb_lm),
@@ -149,4 +149,40 @@ ggplot(data = Pb_all, aes(x = year, y = Pb)) +
   geom_point() +
   geom_point(data = highlight_point, aes(x = year, y = Pb), color = "red", size = 3) +
   facet_wrap(~ region)
-
+##Lab3.C
+Pb_inter <- lm(log(Pb)~I(year-1975)*region, data=Pb_all)
+summary(Pb_inter)
+anova(Pb_lm,Pb_inter)
+Pb_pred2 <- mutate(Pb_all,
+                  yhat = predict(Pb_inter),
+                  r = rstudent(Pb_inter),
+                  v = hatvalues(Pb_inter),
+                  D = cooks.distance(Pb_inter))
+pplus1 <- length(Pb_inter$coefficients)
+ggplot(cbind(Pb_pred2), aes(x = year, y=v, color=region)) +
+  geom_jitter(width=1) + geom_hline(yintercept=1/n) +
+  geom_hline(yintercept = 2*pplus1/n, color = "red")
+highlightcolors <- c("|r*|>3"="red")
+ggplot(Pb_pred2, aes(x = yhat, y = r)) +
+  geom_point(data = filter(Pb_pred2, abs(r) <= 3)) +
+  geom_hline(yintercept = c(-2, 0, 2)) +
+  geom_hline(yintercept = c(-3, 3), linetype = 2) +
+  
+  geom_jitter(data = filter(Pb_pred2, abs(r) > 3),
+              aes(color = "|r*|>3"), width = 0, height = 0.05, size = 3) +
+  
+  labs(title = "Studentized residuals vs predictor",
+       color = "Highlight") +
+  scale_color_manual(values = highlightcolors) +
+  theme(legend.position = "bottom") + facet_wrap(~region)
+##3.B(b)
+mod1  <- lm(log(Pb)~I(year-1975),Pb_all)
+summary(mod1)
+summary(Pb_lm)
+summary(Pb_inter)
+AIC(mod1)
+AIC(Pb_lm)
+AIC(Pb_inter)
+BIC(mod1)
+BIC(Pb_lm)
+BIC(Pb_inter)
